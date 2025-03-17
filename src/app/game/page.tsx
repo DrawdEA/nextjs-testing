@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAnswerStore } from "@/store/answerStore";
 
 import Button from "../../components/Button";
 
 export default function Page() {
     const router = useRouter();
-    const [answer, setAnswer] = useState("Create a prompt that other people will guess.");
     const [inputValue, setInputValue] = useState("");
+
+    const answer = useAnswerStore((state) => state.answer);
+    const setAnswer = useAnswerStore((state) => state.setAnswer);
+    const setPrompt = useAnswerStore((state) => state.setPrompt);
 
     // Returns a DeepSeek AI Response from the textbox.
     async function getAIAnswer() {
@@ -17,7 +21,7 @@ export default function Page() {
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
-                  "Authorization": "Bearer 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",
+                  "Authorization": "Bearer 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",
                   "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -49,9 +53,9 @@ export default function Page() {
                 />
                 <Button text="SEARCH" onClick={async () => {
                     setAnswer("Loading..");
-                    let generatedAnswer;
+                    setPrompt(inputValue);
                     const start = performance.now();
-                    generatedAnswer = await getAIAnswer();
+                    const generatedAnswer = await getAIAnswer();
                     const end = performance.now();
                     console.log(`Execution time: ${end - start} ms`);
                     if (generatedAnswer == null) {
