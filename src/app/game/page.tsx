@@ -14,37 +14,8 @@ export default function Page() {
     const setAnswer = useAnswerStore((state) => state.setAnswer);
     const setPrompt = useAnswerStore((state) => state.setPrompt);
 
-    // Returns a DeepSeek AI Response from the textbox.
-    async function getAIAnswer() {
-        const input = inputValue
-        try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                  "Authorization": "Bearer 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",
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                  "model": "deepseek/deepseek-r1:free",
-                  "messages": [
-                    {
-                      "role": "user",
-                      "content": input
-                    }
-                  ]
-                })
-            });
-    
-            const data = await response.json();
-            const markdownText = data.choices?.[0]?.message?.content;
-            return markdownText;
-        } catch(error) {
-            return "Error";
-        }
-    }
-
     return (
-        <div className="flex flex-col items-center h-screen gap-5">
+        <>
             <div className="flex p-1 gap-1">
                 <input 
                     className="border-2 rounded"
@@ -52,12 +23,28 @@ export default function Page() {
                     value={inputValue} onChange={(e) => setInputValue(e.target.value)}
                 />
                 <Button text="SEARCH" onClick={async () => {
+                    // Set the loading interface.
                     setAnswer("Loading..");
                     setPrompt(inputValue);
+                    
+                    // Try to generate an answer.
                     const start = performance.now();
-                    const generatedAnswer = await getAIAnswer();
+                    let generatedAnswer;
+                    try {
+                        const response = await fetch("../../api/deepseek", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ prompt: inputValue }),
+                        })
+                        const data = await response.json();
+                        generatedAnswer = data.response;
+                    } catch (error) {
+                        console.error("Error:", error);
+                    }
                     const end = performance.now();
                     console.log(`Execution time: ${end - start} ms`);
+
+                    // Check if the request for an answer is valid.
                     if (generatedAnswer == null) {
                         setAnswer("Question not valid! Try a different prompt.");
                     } else {
@@ -68,6 +55,6 @@ export default function Page() {
             </div>
             
             <p>{answer}</p>
-        </div>
+        </>
     );
 }

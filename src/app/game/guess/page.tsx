@@ -19,7 +19,7 @@ export default function Page() {
     const [currentPlayer, setPlayer] = useState(1);
 
     return (
-        <div className="flex flex-col items-center gap-2">
+        <>
             <div>Player {currentPlayer}, place your guess here:</div>
             <div className="flex gap-2">
                 <input type="text" className="border-2 rounded" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
@@ -29,12 +29,13 @@ export default function Page() {
                     console.log(currentPlayer);
                     if (currentPlayer >= players.length) {
                         router.push("/game/results");
+                    } else {
+                        setPlayer(currentPlayer + 1);
                     }
-                    setPlayer(currentPlayer + 1);
                     setInputValue("");
                 }}/>
             </div>
             <div>{answer}</div>
-        </div>
+        </>
     );
 }

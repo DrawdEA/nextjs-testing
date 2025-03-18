@@ -8,7 +8,7 @@ export default function Page() {
     const players = usePlayerStore((state) => state.players);
 
     return (
-        <div className="flex flex-col items-center gap-2">
+        <>
             <div>
                 <p>The prompt was..</p>
                 <p>{prompt}</p>
@@ -26,6 +26,6 @@ export default function Page() {
             <div>
                 Player [NUMBER] Won!
             </div>
-        </div>
+        </>
     );
 }
