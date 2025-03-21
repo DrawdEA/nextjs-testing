@@ -14,19 +14,35 @@ export default function Page() {
     const answer = useAnswerStore((state) => state.answer);
     const players = usePlayerStore((state) => state.players);
     const updatePrompt = usePlayerStore((state) => state.updatePrompt);
+    const updateSimilarity = usePlayerStore((state) => state.updateSimilarity);
 
     const [inputValue, setInputValue] = useState("");
     const [currentPlayer, setPlayer] = useState(1);
 
     return (
         <>
-            <div>Player {currentPlayer}, place your guess here:</div>
-            <div className="flex gap-2">
-                <input type="text" className="border-2 rounded" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
-                <Button text="SUBMIT" onClick = {() => {
+            <div className="pb-5">Player {currentPlayer}, place your guess here:</div>
+            <div className="flex gap-2 pb-5">
+                <input type="text" className="border-2 rounded w-100" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+                <Button text="SUBMIT" onClick = {async () => {
                     updatePrompt(currentPlayer, inputValue);
-                    console.log(players.length);
-                    console.log(currentPlayer);
+
+                    // Generate the similarity.
+                    let similarity = -1;
+                    try {
+                        const response = await fetch("/api/similarity", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ answer: inputValue, correctAnswer: answer }),
+                        })
+                        const data = await response.json();
+                        similarity = data.similarity ?? -1;
+                    } catch (error) {
+                        console.error("Error:", error);
+                    }
+                    console.log(similarity);
+                    updateSimilarity(currentPlayer, similarity);
+
                     if (currentPlayer >= players.length) {
                         router.push("/game/results");
                     } else {
@@ -35,7 +51,7 @@ export default function Page() {
                     setInputValue("");
                 }}/>
             </div>
-            <div>{answer}</div>
+            <div className="text-center mx-20">{answer}</div>
         </>
     );
 }

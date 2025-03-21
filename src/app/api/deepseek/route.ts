@@ -35,9 +35,9 @@ export async function POST(req: Request) {
     // Get the data and return it.
     const data = await response.json();
     const markdownText = data.choices?.[0]?.message?.content;
-    return NextResponse.json({response: markdownText});
+    return NextResponse.json({ response: markdownText });
   } catch (error) {
     // Check if there are any errors.
-    return new NextResponse(JSON.stringify({ error: "Something went wrong" }), { status: 500 });
+    return new NextResponse(JSON.stringify({ error: "Something went wrong" }), { status: 400 });
   }
 }

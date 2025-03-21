@@ -16,9 +16,10 @@ export default function Page() {
 
     return (
         <>
-            <div className="flex p-1 gap-1">
+            <div className="pb-5">Insert the prompt to be guessed here:</div>
+            <div className="flex p-1 gap-1 pb-5">
                 <input 
-                    className="border-2 rounded"
+                    className="border-2 rounded w-100"
                     type="text" 
                     value={inputValue} onChange={(e) => setInputValue(e.target.value)}
                 />
@@ -31,7 +32,7 @@ export default function Page() {
                     const start = performance.now();
                     let generatedAnswer;
                     try {
-                        const response = await fetch("../../api/deepseek", {
+                        const response = await fetch("/api/deepseek", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ prompt: inputValue }),
@@ -53,8 +54,7 @@ export default function Page() {
                     }
                 }} />
             </div>
-            
-            <p>{answer}</p>
+            <div>{ answer }</div>
         </>
     );
 }

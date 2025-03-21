@@ -13,7 +13,7 @@ export const useAnswerStore = create<AnswerStore>((set) => ({
     setPrompt: (newPrompt) => {
         set((state) => ({prompt: newPrompt}));
     },
-    setAnswer: async (newAnswer) => {
+    setAnswer: (newAnswer) => {
         set((state) => ({answer: newAnswer}));
-    }
+    },
 }))

@@ -7,7 +7,7 @@ async function getModel() {
   if (!modelPromise) {
     modelPromise = pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
   }
-  return modelPromise;
+  return await modelPromise;
 }
 
 // Cosine similarity function
@@ -27,19 +27,19 @@ export async function POST(req: Request) {
         }
 
         /*
-        Get the embeddings of the answers. 
-        This quantifies the sentences along with its context, readying itself to be compared via cosine similarity.
+            Get the embeddings of the answers. 
+            This quantifies the sentences along with its context, readying itself to be compared via cosine similarity.
         */
         const model = await getModel()
-        const answerEmbedding = await model(answer, { pooling: 'mean', normalize: true }).data;
-        const correctAnswerEmbedding = await model(correctAnswer, { pooling: 'mean', normalize: true }).data;
+        const answerEmbedding = await model(answer, { pooling: 'mean', normalize: true });
+        const correctAnswerEmbedding = await model(correctAnswer, { pooling: 'mean', normalize: true });  
 
         // Get their cosine similarity.
-        const similarity = cosineSimilarity(answerEmbedding, correctAnswerEmbedding);
+        const similarity = cosineSimilarity(Array.from(answerEmbedding.data), Array.from(correctAnswerEmbedding.data));
 
         // Return the similarity.
         return new NextResponse(JSON.stringify({ similarity: similarity }), { status: 200 });
     } catch (error) {
-        return new NextResponse(JSON.stringify({ error: "Something went wrong" }), { status: 500 });
+        return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
     }
 }
